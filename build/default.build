@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+
+<project name="default-build" default="build" xmlns="http://nant.sf.net/schemas/nant.xsd">
+  <property name="build_mode" value="Release"/>
+  <property name="framework" value="C:\Windows\Microsoft.NET\Framework\v4.0.30319\"/>
+  <property name="framework64" value="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\"/>
+  <property name="framework-2.0" value="C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\"/>
+  <property name="build.dir" value="${directory::get-current-directory()}\build\"/>
+ 
+  <property name="src.dir" value = "${directory::get-current-directory()}\..\src\AWS_Console_App1"/>
+
+  <property name="build.number" dynamic="true" value="0.0.0.0" unless="${property::exists('build.number')}"/>
+
+  <target name="build" description="Compiles and Tests" depends="clean-VS, update_version, compile"/>
+
+  <target name="clean-VS" description="Delete Visual Studio Binaries">
+    <delete>
+      <fileset basedir=".">
+        <include name="**\bin\Debug\**"/>
+        <include name="**\obj\Debug\**"/>
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="update_version" description="Updates the AssemblyInfo file">
+    <asminfo output="${src.dir}\AssemblyInfo.cs" language="CSharp">
+      <imports>
+        <import namespace="System" />
+        <import namespace="System.Reflection" />
+        <import namespace="System.Runtime.InteropServices" />
+      </imports>
+      <attributes>
+        <attribute type="AssemblyVersionAttribute" value="${build.number}" />
+      </attributes>
+    </asminfo>
+  </target>
+
+
+  <target name="compile" description="Compiles binaries">
+    <exec program="MSBuild.exe" basedir="${framework}">
+      <arg value="${src.dir}\AWS_Console_App1.sln"/>
+      <arg value="/verbosity:q"/>
+      <arg value="/target:Rebuild"/>
+      <arg value="/property:Configuration=${build_mode}"/>
+      <arg value="/clp:ErrorsOnly"/>
+      <arg value="/p:OutDir=${build.dir}_${build.number}\" />
+    </exec>
+  </target>
+
+
+  <!--<target name="test">
+    <mkdir dir="${build.dir}_${build.number}"
+					 unless="${directory::exists('${build.dir}_${build.number}')}" />
+    <exec program="nunit-console.exe" basedir="${tools.dir}NUnit\bin\net-2.0\" workingdir="${website.dir}">
+      <arg value="/nologo" />
+      <arg value="${build.dir}Freedman.Tests.dll" />
+      <arg value="/xml:${reports.dir}Tests.xml" />
+      <arg value="/nodots" />
+      <arg value="/exclude=Integration" />
+    </exec>
+  </target>-->
+
+</project>
