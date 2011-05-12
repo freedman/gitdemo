@@ -1,0 +1,1 @@
+run this command line to create an aws ec2 windows 2008 r2/sql server 2008 r2 with 200GB hard disk instance
